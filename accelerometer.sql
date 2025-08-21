@@ -13,5 +13,5 @@ WITH SERDEPROPERTIES (
   'mapping' = 'TRUE'
 )
 STORED AS INPUTFORMAT 'org.apache.hadoop.mapred.TextInputFormat' OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
-LOCATION '### my s3 path ###'
+LOCATION 's3://zsmbucket360/accelerometer/landing/'
 TBLPROPERTIES ('classification' = 'json');
