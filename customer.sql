@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS `# my_project #`.`# customer_landing #` (
+CREATE EXTERNAL TABLE IF NOT EXISTS `stedi`.`customer_landing` (
   `customername` string,
   `email` string,
   `phone` string,
