@@ -21,16 +21,26 @@ customer_landing_df = glueContext.create_dynamic_frame.from_options(
     transformation_ctx="customer_landing_df",
 )
 
-# Filter for privacy-consenting customers
-privacy_filtered_df = Filter.apply(
+# Explicitly map the serialnumber field to a string type
+mapped_df = ApplyMapping.apply(
     frame=customer_landing_df,
-    f=lambda row: (row["sharewithresearchasofdate"] is not None and row["sharewithresearchasofdate"] != 0),
-    transformation_ctx="privacy_filtered_df",
+    mappings=[
+        ("serialnumber", "string", "serialnumber", "string"),
+        ("email", "string", "email", "string"),
+        ("customerName", "string", "customerName", "string"),
+        ("phone", "string", "phone", "string"),
+        ("birthDay", "string", "birthDay", "string"),
+        ("registrationDate", "long", "registrationDate", "long"),
+        ("shareWithFriendsAsOfDate", "long", "shareWithFriendsAsOfDate", "long"),
+        ("shareWithResearchAsOfDate", "long", "shareWithResearchAsOfDate", "long"),
+        ("shareWithPublicAsOfDate", "long", "shareWithPublicAsOfDate", "long"),
+    ],
+    transformation_ctx="mapped_df",
 )
 
 # Write to the trusted zone as Parquet
 glueContext.write_dynamic_frame.from_options(
-    frame=privacy_filtered_df,
+    frame=mapped_df,
     connection_type="s3",
     format="glueparquet",
     connection_options={"path": "s3://zsmbucket360/customer/trusted/", "partitionKeys": []},

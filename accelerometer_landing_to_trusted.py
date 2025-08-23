@@ -12,27 +12,17 @@ spark = glueContext.spark_session
 job = Job(glueContext)
 job.init(args["JOB_NAME"], args)
 
-# Read accelerometer data from landing zone
-accelerometer_landing_df = glueContext.create_dynamic_frame.from_options(
-    format_options={"multiline": False},
-    connection_type="s3",
-    format="json",
-    connection_options={
-        "paths": ["s3://zsmbucket360/accelerometer/landing/"],
-        "recurse": True,
-    },
+# Read accelerometer data from landing zone using the Data Catalog
+accelerometer_landing_df = glueContext.create_dynamic_frame.from_catalog(
+    database="stedi",
+    table_name="accelerometer_landing",
     transformation_ctx="accelerometer_landing_df",
 )
 
-# Read trusted customer data
-customer_trusted_df = glueContext.create_dynamic_frame.from_options(
-    format_options={"multiline": False},
-    connection_type="s3",
-    format="glueparquet",
-    connection_options={
-        "paths": ["s3://zsmbucket360/customer/trusted/"],
-        "recurse": True,
-    },
+# Read trusted customer data using the Data Catalog
+customer_trusted_df = glueContext.create_dynamic_frame.from_catalog(
+    database="stedi",
+    table_name="customer_trusted",
     transformation_ctx="customer_trusted_df",
 )
 

@@ -35,16 +35,23 @@ joined_data = Join.apply(
     transformation_ctx="joined_data",
 )
 
-# Write the joined data to the curated zone
-glueContext.write_dynamic_frame.from_options(
+# Drop redundant fields from the curated customer data
+machine_learning_curated_df = DropFields.apply(
     frame=joined_data,
+    paths=["email", "birthDay", "customerName", "phone", "registrationDate", "shareWithFriendsAsOfDate", "shareWithResearchAsOfDate", "shareWithPublicAsOfDate", "lastUpdateDate"],
+    transformation_ctx="machine_learning_curated_df",
+)
+
+# Write the final curated data to the correct ML curated zone
+glueContext.write_dynamic_frame.from_options(
+    frame=machine_learning_curated_df,
     connection_type="s3",
     format="glueparquet",
     connection_options={
-        "path": "s3://zsmbucket360/step_trainer/curated/",
+        "path": "s3://zsmbucket360/machine_learning/curated/",
         "partitionKeys": [],
     },
-    transformation_ctx="write_to_step_trainer_curated",
+    transformation_ctx="write_to_ml_curated",
 )
 
 job.commit()
