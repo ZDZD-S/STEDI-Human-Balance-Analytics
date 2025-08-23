@@ -21,7 +21,7 @@ customer_landing_df = glueContext.create_dynamic_frame.from_options(
     transformation_ctx="customer_landing_df",
 )
 
-# Explicitly map the serialnumber field to a string type
+# Explicitly map the fields to the correct types
 mapped_df = ApplyMapping.apply(
     frame=customer_landing_df,
     mappings=[
@@ -38,9 +38,16 @@ mapped_df = ApplyMapping.apply(
     transformation_ctx="mapped_df",
 )
 
+# Filter for records with a 'shareWithResearchAsOfDate' value from the mapped data
+privacy_filtered_df = Filter.apply(
+    frame=mapped_df,
+    f=lambda row: row["shareWithResearchAsOfDate"] is not None,
+    transformation_ctx="privacy_filtered_df",
+)
+
 # Write to the trusted zone as Parquet
 glueContext.write_dynamic_frame.from_options(
-    frame=mapped_df,
+    frame=privacy_filtered_df,
     connection_type="s3",
     format="glueparquet",
     connection_options={"path": "s3://zsmbucket360/customer/trusted/", "partitionKeys": []},
